@@ -26,21 +26,34 @@ class CosmicWrap:
         self.denom = denom
 
     # queries the balance of all coins for a single account.
-    def query_balances(self, address: str):
+    def query_balances(self, address):
         responses = []
-        endpoint = '/cosmos/bank/v1beta1/balances/'
+        endpoint = 'cosmos/bank/v1beta1/balances/'
         try:
-            results = json.loads(requests.get(self.lcd + endpoint + address, timeout=60).content)
+            response = requests.get(f"{self.lcd}{endpoint}{address}", timeout=60)
+            if response.status_code != 200:
+                raise Exception(f"Unexpected status code: {response.status_code}")
+
+            results = response.json()
             responses += results['balances']
             pagination = results['pagination']['next_key']
+
             while pagination is not None:
-                results = json.loads(
-                    requests.get(self.lcd + endpoint + '?pagination.key=' + quote(str(pagination)), timeout=60).content)
+                response = requests.get(f"{self.lcd}{endpoint}?pagination.key={quote(str(pagination))}", timeout=60)
+                if response.status_code != 200:
+                    raise Exception(f"Unexpected status code: {response.status_code}")
+
+                results = response.json()
                 responses += results['balances']
                 pagination = results['pagination']['next_key']
+
             return responses
-        except Exception:
-            raise Exception
+
+        except requests.exceptions.RequestException as e:
+            raise Exception(f"Network error: {e}")
+
+        except json.JSONDecodeError:
+            raise Exception("Failed to parse JSON response")
 
     # queries the balance of a given denom for a single account.
     def query_balances_by_denom(self, address, denom):

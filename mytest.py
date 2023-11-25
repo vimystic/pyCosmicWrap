@@ -1,7 +1,7 @@
 from pycosmicwrap import CosmicWrap
 
 # create an object with rest api url, rpc url and denom as arguments
-osmosis = CosmicWrap(lcd='https://rpc.osmosis.zone:443',
+osmosis = CosmicWrap(lcd='https://rpc.osmosis.zone',
                        rpc='https://lcd.osmosis.zone',
                        denom='uosmo')
 

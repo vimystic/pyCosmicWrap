@@ -31,6 +31,7 @@ class CosmicWrap:
         endpoint = 'cosmos/bank/v1beta1/balances/'
         try:
             response = requests.get(f"{self.lcd}{endpoint}{address}", timeout=60)
+            print(response.content) 
             if response.status_code != 200:
                 raise Exception(f"Unexpected status code: {response.status_code}")
 
